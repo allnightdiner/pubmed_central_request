@@ -11,7 +11,7 @@ sys.path.insert(0, root('apps'))
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'CHANGE THIS!!!'
+SECRET_KEY = '3kfii42kv092ikdklqlqlnoaoalwk 1f 0v999s90kzxck;ewkKKKD#I)0($(#knfn32{39eak'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -30,7 +30,9 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles'
 )
 
-PROJECT_APPS = ()
+PROJECT_APPS = (
+    'pmc_request',
+)
 
 INSTALLED_APPS += PROJECT_APPS
 
