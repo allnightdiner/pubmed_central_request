@@ -108,3 +108,6 @@ except ImportError:
 # importing test settings file if necessary
 if len(sys.argv) > 1 and 'test' in sys.argv[1]:
     from .testing import *
+
+#Store URL as string to be formatted
+REQUEST_URL = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?id=PMC{pmc_id}&db=pmc"
