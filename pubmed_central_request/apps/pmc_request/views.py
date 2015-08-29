@@ -27,7 +27,8 @@ class PMCRequestForm(FormView):
         request = Request(pmc_article = pmc_article, article_accepted = False)
         request.save()
         
-        self.success_url = reverse_lazy('request_detail', kwargs = {'pk': request.id})
+        self.success_url = reverse_lazy('request_detail', 
+                                        kwargs = {'pk': request.id})
         return super(PMCRequestForm, self).form_valid(form)
 
 class RequestDetail(FormMixin, DetailView):
@@ -39,14 +40,28 @@ class RequestDetail(FormMixin, DetailView):
         context = super(RequestDetail, self).get_context_data(**kwargs)
         url = settings.REQUEST_URL.format(pmc_id=self.object.pmc_article.pmc_id)
         url_file = urllib.request.urlopen(url)
+        if url_file == None:
+            #set error message
+            pass
         tree = ElementTree.parse(url_file)
         root = tree.getroot()
-        context['article_title'] = root.find('.//article-title').text
-        '''
-        context['article_author'] = 
-        '''
+        
+        article_title = root.find('.//article-title').text
+        
+        article_authors = []
+        article_authors_xml = root.findall(".//contrib[@contrib-type='author']"\
+                                           "/name")
+        for author in article_authors_xml:
+            surname = author.find("surname").text
+            given_names = author.find("given-names").text
+            article_authors.append(surname + ", " + given_names)
+        
+        context['article_title'] = article_title
+        context['article_authors'] = article_authors
         context['article_url'] = url
+        
         url_file.close()
+        
         return context
 
     def post(self, request, *args, **kwargs):

@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
     {{ article_url }}<br/>
+    <h4>Article Title:</h4>
     {{ article_title }}<br/>
-    {{ article_author }}<br/>
+    <h4>Authors:</h4>
+    <ul>
+    {% for author in article_authors %}
+        <li>{{ author }}</li>
+    {% endfor %}
+    </ul>
 {% endblock %}
