@@ -1,5 +1,5 @@
+from xml.etree import ElementTree
 import urllib.request
-import xmltodict
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -39,14 +39,14 @@ class RequestDetail(FormMixin, DetailView):
         context = super(RequestDetail, self).get_context_data(**kwargs)
         url = settings.REQUEST_URL.format(pmc_id=self.object.pmc_article.pmc_id)
         url_file = urllib.request.urlopen(url)
-        url_data = url_file.read()
-        url_file.close()
-        data = xmltodict.parse(url_data)
-        context['article_title'] = data['pmc-articleset']['article']['front']['article-meta']['title-group']['article-title']
+        tree = ElementTree.parse(url_file)
+        root = tree.getroot()
+        context['article_title'] = root.find('.//article-title').text
         '''
         context['article_author'] = 
         '''
         context['article_url'] = url
+        url_file.close()
         return context
 
     def post(self, request, *args, **kwargs):
