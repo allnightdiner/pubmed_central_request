@@ -72,4 +72,4 @@ pubmed_central_request/assets-src/vendor/
 .sass-cache/
 
 #vim
-*.sqp
+*.swp
