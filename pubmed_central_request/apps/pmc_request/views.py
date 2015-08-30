@@ -38,6 +38,8 @@ class RequestDetail(FormMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(RequestDetail, self).get_context_data(**kwargs)
+        context['form'] = self.get_form()
+        
         url = settings.REQUEST_URL.format(pmc_id=self.object.pmc_article.pmc_id)
         url_file = urllib.request.urlopen(url)
         if url_file == None:
