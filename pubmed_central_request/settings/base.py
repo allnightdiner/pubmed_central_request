@@ -11,7 +11,7 @@ sys.path.insert(0, root('apps'))
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '3kfii42kv092ikdklqlqlnoaoalwk 1f 0v999s90kzxck;ewkKKKD#I)0($(#knfn32{39eak'
+SECRET_KEY = 'Change This'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -111,3 +111,4 @@ if len(sys.argv) > 1 and 'test' in sys.argv[1]:
 
 #Store URL as string to be formatted
 REQUEST_URL = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?id=PMC{pmc_id}&db=pmc"
+SENDING_EMAIL = "example@example.com"

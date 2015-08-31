@@ -1,17 +1,22 @@
-from xml.etree import ElementTree
+import os
+import smtplib
 import urllib.request
+from datetime import datetime
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from xml.etree import ElementTree
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.core.urlresolvers import reverse_lazy
 from django.forms.forms import NON_FIELD_ERRORS
 from django.forms.util import ErrorList
-from django.shortcuts import render
 from django.views.generic import DetailView, FormView, ListView
 from django.views.generic.edit import FormMixin
 
 from pmc_request.forms import PMCRequestForm, PMCRequestAcceptForm
 from pmc_request.models import PMCArticle, Request 
+
 
 class PMCRequestForm(FormView):
     template_name = 'request.html'
@@ -75,7 +80,7 @@ class PMCRequestForm(FormView):
 class RequestDetail(FormMixin, DetailView):
     model = Request
     form_class = PMCRequestAcceptForm
-    succes_url = "/"
+    success_url = "/"
 
     def get_context_data(self, **kwargs):
         context = super(RequestDetail, self).get_context_data(**kwargs)
@@ -91,9 +96,40 @@ class RequestDetail(FormMixin, DetailView):
             return self.form_invalid(form)
 
     def form_valid(self, form):
-        #set request objects article_accepted field
         #send email to author
-        return super(ReqestDetail, self).form_valid(form)
+        '''
+        msg = MIMEMultipart('alternative')
+
+        msg['Subject'] = "Article Access Notification"
+        msg['From'] = settings.SENDING_EMAIL
+        msg['To'] = self.object.pmc_article.author_email
+        
+        email_template = "Hello {name},\nThis is a notification that your "\
+                         "article {article_title} has been searched for "\
+                         "in PubMed Central\n"
+        text = email_template.format(
+                name = self.object.pmc_article.author,
+                article_title = self.object.pmc_article.title
+        )
+        mime_text = MIMEText(text, 'plain')
+
+        username = os.environ['MANDRILL_USERNAME']
+        password = os.environ['MANDRILL_PASSWORD']
+
+        msg.attach(mime_text)
+
+        s = smtplib.SMTP('smtp.mandrillapp.com', 587)
+
+        s.login(username, password)
+        s.sendmail(msg['From'], msg['To'], msg.as_string())
+        s.quit()
+        '''
+        
+        self.object.article_accepted = form.cleaned_data['accept_article']
+        self.object.email_sent_timestamp = datetime.now()
+        self.object.save()
+        return super(RequestDetail, self).form_valid(form)
 
 class RequestList(ListView):
     model = Request
+
