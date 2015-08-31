@@ -3,7 +3,7 @@
 <table class="table table-striped">
 <thead>
 <tr>
-<th>Article Url</th>
+<th>Article</th>
 <th>Request Submitted</th>
 <th>Article Accepted?</th>
 <th>Author Email</th>
@@ -13,7 +13,7 @@
 <tbody>
 {% for request in object_list %}
     <tr>
-        <td>{{ request.pmc_article.url }}</td>
+        <td><a href="{{ request.pmc_article.url }}">{{ request.pmc_article.title }}</a></td>
         <td>{{ request.request_timestamp }}</td>
         <td>{{ request.article_accepted }}</td>
         <td>{{ request.pmc_article.author_email }}</td>
