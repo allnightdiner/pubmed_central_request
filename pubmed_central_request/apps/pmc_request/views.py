@@ -21,7 +21,41 @@ class PMCRequestForm(FormView):
         try:
             pmc_article = PMCArticle.objects.get(pmc_id=form_pmc_id)
         except ObjectDoesNotExist:
-            pmc_article = PMCArticle(pmc_id = form_pmc_id)
+            url = settings.REQUEST_URL.format(pmc_id=form_pmc_id)
+            
+            url_file = urllib.request.urlopen(url)
+            if url_file == None:
+                self.form_invalid(form)
+            
+            tree = ElementTree.parse(url_file)
+            root = tree.getroot()
+            
+            error = root.find(".//Reply")
+            if error is not None:
+                #show error message redirect to form
+                return self.form_invalid(form)
+            
+            article_title = root.find('.//article-title').text
+            
+            author_xml = root.find(
+                    ".//xref[@ref-type='corresp']/..[@contrib-type='author']/"
+            )
+            surname = author_xml.find("surname").text
+            given_names = author_xml.find("given-names").text
+            author = surname + ", " + given_names
+            
+            author_email_xml = root.find(".//corresp/email")
+            author_email = author_email_xml.text
+            
+            url_file.close()
+           
+            pmc_article = PMCArticle(
+                pmc_id = form_pmc_id,
+                title = article_title,
+                author = author,
+                author_email = author_email,
+                url = url
+            )
             pmc_article.save()
         
         request = Request(pmc_article = pmc_article, article_accepted = False)
@@ -39,31 +73,6 @@ class RequestDetail(FormMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(RequestDetail, self).get_context_data(**kwargs)
         context['form'] = self.get_form()
-        
-        url = settings.REQUEST_URL.format(pmc_id=self.object.pmc_article.pmc_id)
-        url_file = urllib.request.urlopen(url)
-        if url_file == None:
-            #set error message
-            pass
-        tree = ElementTree.parse(url_file)
-        root = tree.getroot()
-        
-        article_title = root.find('.//article-title').text
-        
-        article_authors = []
-        article_authors_xml = root.findall(".//contrib[@contrib-type='author']"\
-                                           "/name")
-        for author in article_authors_xml:
-            surname = author.find("surname").text
-            given_names = author.find("given-names").text
-            article_authors.append(surname + ", " + given_names)
-        
-        context['article_title'] = article_title
-        context['article_authors'] = article_authors
-        context['article_url'] = url
-        
-        url_file.close()
-        
         return context
 
     def post(self, request, *args, **kwargs):
@@ -79,3 +88,5 @@ class RequestDetail(FormMixin, DetailView):
         #send email to author
         return super(ReqestDetail, self).form_valid(form)
 
+class RequestList(ListView):
+    model = Request
