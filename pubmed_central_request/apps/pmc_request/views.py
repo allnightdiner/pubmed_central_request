@@ -4,6 +4,8 @@ import urllib.request
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse, reverse_lazy
+from django.forms.forms import NON_FIELD_ERRORS
+from django.forms.util import ErrorList
 from django.shortcuts import render
 from django.views.generic import DetailView, FormView, ListView
 from django.views.generic.edit import FormMixin
@@ -25,6 +27,9 @@ class PMCRequestForm(FormView):
             
             url_file = urllib.request.urlopen(url)
             if url_file == None:
+                form._errors[NON_FIELD_ERRORS] = ErrorList([
+                                "Unable to access URL generated: " + url
+                            ])
                 self.form_invalid(form)
             
             tree = ElementTree.parse(url_file)
@@ -32,7 +37,9 @@ class PMCRequestForm(FormView):
             
             error = root.find(".//Reply")
             if error is not None:
-                #show error message redirect to form
+                form._errors[NON_FIELD_ERRORS] = ErrorList([
+                                error.attrib['error']
+                            ])
                 return self.form_invalid(form)
             
             article_title = root.find('.//article-title').text

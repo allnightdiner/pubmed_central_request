@@ -6,14 +6,14 @@
 <th>Article Url</th>
 <th>Request Submitted</th>
 <th>Article Accepted?</th>
-<th>Article Author Email</th>
+<th>Author Email</th>
 <th>Email Sent</th>
 </tr>
 </thead>
 <tbody>
 {% for request in object_list %}
     <tr>
-        <td>{{ request.article }}</td>
+        <td>{{ request.pmc_article.url }}</td>
         <td>{{ request.request_timestamp }}</td>
         <td>{{ request.article_accepted }}</td>
         <td>{{ request.pmc_article.author_email }}</td>
