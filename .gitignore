@@ -59,7 +59,6 @@ pubmed_central_request/settings/local.py
 pubmed_central_request/settings/production.py
 
 # collect static output directory
-pubmed_central_request/assets/
 pubmed_central_request/static/
 
 .DS_Store
