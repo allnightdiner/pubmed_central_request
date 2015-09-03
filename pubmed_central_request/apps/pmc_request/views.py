@@ -23,19 +23,33 @@ def get_authors(root):
             ".//contrib[@contrib-type='author']/name"
     )
     for author_xml in authors_xml:
-        surname = author_xml.find("surname").text
-        given_names = author_xml.find("given-names").text
+        try:
+            surname = author_xml.find("surname").text
+        except AttributeError:
+            surname = ""
+        try:
+            given_names = author_xml.find("given-names").text
+        except AttributeError:
+            given_names = ""
+        if (surname == "") and (given_names == ""):
+            continue
         author = surname + ", " + given_names
         authors.append(author)
     return authors
 
 def get_article_title(root):
-    article_title = root.find('.//article-title').text
+    try:
+        article_title = root.find('.//article-title').text
+    except AttributeError:
+        article_title = ""
     return article_title
 
 def get_corresp_email(root):
-    corresp_email_xml = root.find(".//corresp/email")
-    corresp_email = corresp_email_xml.text
+    try:
+        corresp_email_xml = root.find(".//corresp/email")
+        corresp_email = corresp_email_xml.text
+    except AttributeError:
+        corresp_email = ""
     return corresp_email
 
 class PMCRequestForm(FormView):
