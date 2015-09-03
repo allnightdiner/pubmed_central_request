@@ -17,7 +17,7 @@ SECRET_KEY = 'Change This'
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 # Application definition
 
@@ -111,4 +111,5 @@ if len(sys.argv) > 1 and 'test' in sys.argv[1]:
 
 #Store URL as string to be formatted
 REQUEST_URL = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?id=PMC{pmc_id}&db=pmc"
+DISPLAY_URL = "http://www.ncbi.nlm.nih.gov/pmc/articles/PMC{pmc_id}/"
 SENDING_EMAIL = "example@example.com"

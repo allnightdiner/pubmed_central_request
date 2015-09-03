@@ -84,6 +84,7 @@ class PMCRequestForm(FormView):
             article_title = get_article_title(root)
             corresp_email = get_corresp_email(root)
             authors = get_authors(root)
+            display_url = settings.DISPLAY_URL.format(pmc_id = form_pmc_id)
             
             url_file.close()
             
@@ -91,7 +92,7 @@ class PMCRequestForm(FormView):
                 pmc_id = form_pmc_id,
                 title = article_title,
                 corresp_email = corresp_email,
-                url = url
+                url = display_url
             )
             pmc_article.save()
             
