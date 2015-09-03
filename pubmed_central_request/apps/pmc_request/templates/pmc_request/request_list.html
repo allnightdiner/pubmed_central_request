@@ -16,7 +16,7 @@
         <td><a href="{{ request.pmc_article.url }}">{{ request.pmc_article.title }}</a></td>
         <td>{{ request.request_timestamp }}</td>
         <td>{{ request.article_accepted }}</td>
-        <td>{{ request.pmc_article.author_email }}</td>
+        <td>{{ request.pmc_article.corresp_email }}</td>
         <td>{{ request.email_sent_timestamp }}</td>
     </tr>
 {% endfor %}
