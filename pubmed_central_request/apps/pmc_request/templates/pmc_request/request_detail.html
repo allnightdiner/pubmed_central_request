@@ -4,9 +4,12 @@
     <a href="{{ object.pmc_article.url }}">{{ object.pmc_article.url }}</a><br/>
     <h4>Article Title:</h4>
     {{ object.pmc_article.title }}<br/>
-    <h4>Author:</h4>
-    {{ object.pmc_article.author }}<br/>
-    {{ object.pmc_article.author_email }}
+    <h4>Authors:</h4>
+    {% for author in object.pmc_article.pmcauthor_set.all %}
+        {{ author.author }}<br/>
+    {% endfor %}
+    <h4>Contact:</h4>
+    {{ object.pmc_article.corresp_email }}<br/>
     <h4>Request Made:</h4>
     {{ object.request_timestamp }}
     <form action="" method="post">{% csrf_token %}

@@ -15,8 +15,28 @@ from django.views.generic import DetailView, FormView, ListView
 from django.views.generic.edit import FormMixin
 
 from pmc_request.forms import PMCRequestForm, PMCRequestAcceptForm
-from pmc_request.models import PMCArticle, Request 
+from pmc_request.models import PMCArticle, PMCAuthor, Request 
 
+def get_authors(root):
+    authors = []
+    authors_xml = root.findall(
+            ".//contrib[@contrib-type='author']/name"
+    )
+    for author_xml in authors_xml:
+        surname = author_xml.find("surname").text
+        given_names = author_xml.find("given-names").text
+        author = surname + ", " + given_names
+        authors.append(author)
+    return authors
+
+def get_article_title(root):
+    article_title = root.find('.//article-title').text
+    return article_title
+
+def get_corresp_email(root):
+    corresp_email_xml = root.find(".//corresp/email")
+    corresp_email = corresp_email_xml.text
+    return corresp_email
 
 class PMCRequestForm(FormView):
     template_name = 'request.html'
@@ -47,29 +67,27 @@ class PMCRequestForm(FormView):
                             ])
                 return self.form_invalid(form)
             
-            article_title = root.find('.//article-title').text
-            
-            author_xml = root.find(
-                    ".//xref[@ref-type='corresp']/..[@contrib-type='author']/"
-            )
-            surname = author_xml.find("surname").text
-            given_names = author_xml.find("given-names").text
-            author = surname + ", " + given_names
-            
-            author_email_xml = root.find(".//corresp/email")
-            author_email = author_email_xml.text
+            article_title = get_article_title(root)
+            corresp_email = get_corresp_email(root)
+            authors = get_authors(root)
             
             url_file.close()
-           
+            
             pmc_article = PMCArticle(
                 pmc_id = form_pmc_id,
                 title = article_title,
-                author = author,
-                author_email = author_email,
+                corresp_email = corresp_email,
                 url = url
             )
             pmc_article.save()
-        
+            
+            for author in authors:
+                pmc_author = PMCAuthor(
+                    author = author
+                )
+                pmc_author.save()
+                pmc_author.pmc_article.add(pmc_article)
+         
         request = Request(pmc_article = pmc_article, article_accepted = False)
         request.save()
         
@@ -96,8 +114,8 @@ class RequestDetail(FormMixin, DetailView):
             return self.form_invalid(form)
 
     def form_valid(self, form):
-        #send email to author
-        '''
+        ''' send email to author
+        
         msg = MIMEMultipart('alternative')
 
         msg['Subject'] = "Article Access Notification"
